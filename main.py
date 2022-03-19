@@ -1,6 +1,7 @@
 import os
 import discord
 from checklist import handle_checklist
+from wordle import play_wordle
 token = os.environ['token']
 
 client = discord.Client()
@@ -29,6 +30,9 @@ async def on_message(message):
     elif  splitmessage[0] == '!cl':
       response = handle_checklist(user_message, author)
       await message.channel.send(response)
+    elif splitmessage[0] == '!wordle':
+      response = play_wordle(user_message, author)
+      await message.channel.send(response)      
   else:
     await message.channel.send('please send messages in **_BOT_  CHANNEL ONLY** :poop:')
 
