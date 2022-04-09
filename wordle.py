@@ -1,46 +1,61 @@
 import random
 in_game = False
-word = ""
+randword = ""
+counter = 6
 file = open('fiveletterwords.txt', 'r')
-def split2(word):
-  return [char for char in word]
 def play_wordle(message, author):
-  global word
+  global randword
   global arr
   global wordarr
   global printarr
+  global in_game
+  global counter
   _, action, *rest = message.split(" ")
   value = " ".join(rest) if len(rest) >= 0 else ""
   if (action == 'start'):
+    counter = 6
     in_game = True
     rand_num = random.randint(0, 500)
     for i in range(rand_num):
-      word = file.readline()
+      randword = file.readline()
     return "Hello! You are now playing wordle!\n How to play: \n You have six tries to guess a five letter word. Each time you guess a word it will tell you which letters are correct or not. Below is how to indicate which letters are wrong or right: \n Wrong: strike-through ~~t~~ \n Right: bold **t** \n Right letter, wrong place: *t*"
-  elif (action == 'end'):
+  elif (action == 'end' and in_game == True):
     in_game = False
     return "You are no longer playing wordle :("
-  elif (action == 'help'):
+  elif (action == 'help' and in_game == True):
     return "How to play: \n You have six tries to guess a five letter word. Each time you guess a word it will tell you which letters are correct or not. Below is how to indicate which letters are wrong or right: \n Wrong: strike-through ~~t~~ \n Right: bold **t** \n Right letter, wrong place: *t*"
-  elif (action == 'guess'):
+  elif (action == 'guess' and in_game == True):
+    counter -= 1
+    word = rest[0]
     arr = []
     wordarr = []
     printarr = []
-    i = 0
-    five = 5
-    while (i < 5):
-       arr[i] = split2(i) #need to change split function, needs to take in the index and the word we want to split
-       wordarr[i] = split2(i)
-    for i in range(len(arr)):
-      if (wordarr[i] == arr[i]): #this is for right letter
-        printarr[i].append(f'**{arr[i]}**')
-      elif (wordarr[i] != arr[i]):
-        printarr[i].append(f'~~{arr[i]}~~')
+    if (len(word) != 5):
+      counter += 1
+      return "The word should be five letters"
+    for j in range(len(word)):
+      colorletter = f'~~{word[j]}~~'
+      for i in range(len(randword)):
+        if (randword[i] == word[j] and j == i):
+          colorletter = f'**{word[j]}**'
+          continue
+        elif (randword[i] == word[j] and j != i):
+          colorletter = f'*{word[j]}*'
+      printarr.append(colorletter)
+    prstr = " ".join(printarr)
+
+    for i in range(len(word)):
+      if (randword[i] == word[i]):
+        i += 1
     
-      
-        
-        
-    #return word
+    if (i == 5):
+      in_game = False
+      return f'{prstr}\nYou win! The word was {randword}'
+    
+    if (counter == 0):
+      in_game = False
+      return f'{prstr}\nYou lose :frowning2: The word was {randword}'
+    return f'Guess: {prstr}\nCounter: {counter}'
   else:
     return "this is not a valid action"
   
